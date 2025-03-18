@@ -1,4 +1,5 @@
 import { Vbo } from './Vbo';
+import { NanoKontrol2 } from './NanoKontrol2';
 //@ts-ignore
 import { Noise } from 'noisejs';
 
@@ -6,15 +7,17 @@ export class Animation {
   private vbo: Vbo;
   private gl: WebGL2RenderingContext;
   private noise;
+  private nanoKontrol2: NanoKontrol2;
 
   constructor(vbo: Vbo, gl: WebGL2RenderingContext) {
     this.vbo = vbo;
     this.gl = gl;
     this.noise = new Noise(Math.random());
+    this.nanoKontrol2 = new NanoKontrol2();
   }
 
   public animate(time: number, volume: number) {
-    const numVertices = 2500;
+    const numVertices = this.nanoKontrol2.getControlValue(16) * 100 || 2500;
     const tau = 2.0 * Math.PI;
     const vertices = [];
     const a = 1.0;

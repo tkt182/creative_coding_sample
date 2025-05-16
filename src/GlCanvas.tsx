@@ -3,6 +3,7 @@ import { Matrix, ProjectionType } from './Matrix';
 import { Shader } from './Shader';
 import { Vbo } from './Vbo';
 import { Animation } from './Animation'
+import { MidiController } from './MidiController';
 import { VFX } from '@vfx-js/core';
 import * as Tone from 'tone';
 
@@ -47,6 +48,18 @@ const GlCanvas: React.FC = () => {
     const analyser = new Tone.Analyser('waveform', 256);
     kick.connect(analyser);
 
+    let slider0Value: number = 0;
+    const createMidiController = async() => {
+      try {
+        const midiController = await MidiController.create();
+        midiController.onSlider0((value: number) => {
+          slider0Value = value;
+        });
+      } catch (error: unknown) {
+        console.error(error);
+      }
+    }
+
     const scene = (rotation: number, deltaTime: number) => {
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
       gl.clearDepth(1.0);
@@ -68,7 +81,8 @@ const GlCanvas: React.FC = () => {
       shader.setProjectMatrixUniform(projectionMatrix);
       shader.setModelViewMatrixUniform(modelViewMatrix);
 
-      animation.animate(deltaTime, volume);
+      const midiContorller = createMidiController();
+      animation.animate(deltaTime, volume, slider0Value);
       vfx.update(canvas);
     };
 

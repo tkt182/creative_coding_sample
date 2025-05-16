@@ -7,14 +7,19 @@ module.exports = {
     path.resolve(__dirname, 'src/index.tsx'),
   ],
   output: {
-    path: path.resolve(__dirname, 'public/js'),
-    publicPath: '/js',
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: '/',
     filename: 'bundle.js',
   },
   resolve: {
+    fallback: {
+      os: false,
+      tty: false,
+      util: false,
+    },
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
-  target: ['web', 'es6'],
+  target: ['web'],
   module: {
     rules: [
       {
@@ -25,10 +30,12 @@ module.exports = {
             loader: 'babel-loader',
             options: {
               plugins: ['react-refresh/babel'],
+              presets: [
+                '@babel/preset-env',
+                ['@babel/preset-react', { runtime: 'automatic' }],
+                '@babel/preset-typescript'
+              ],
             },
-          },
-          {
-            loader: 'ts-loader',
           },
         ],
       },

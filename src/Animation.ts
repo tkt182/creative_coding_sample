@@ -1,4 +1,5 @@
 import { Vbo } from './Vbo';
+import { MidiController } from 'MidiController';
 //@ts-ignore
 import { Noise } from 'noisejs';
 
@@ -13,8 +14,8 @@ export class Animation {
     this.noise = new Noise(Math.random());
   }
 
-  public animate(time: number, volume: number) {
-    const numVertices = 2500;
+  public animate(time: number, volume: number, silderValue: number) {
+    const numVertices = silderValue * 100 || 2500;
     const tau = 2.0 * Math.PI;
     const vertices = [];
     const a = 1.0;

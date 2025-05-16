@@ -8,6 +8,6 @@
 
 # 動作確認
 
-Chromeで `http://localhost:8080` にアクセス
+Chromeで `http://localhost:6000` にアクセス
 
 ![screenshot](docs/creative_cording_sample_screenshot.png)

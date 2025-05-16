@@ -3,6 +3,7 @@ import { Matrix, ProjectionType } from './Matrix';
 import { Shader } from './Shader';
 import { Vbo } from './Vbo';
 import { Animation } from './Animation'
+import { MidiController } from './MidiController';
 import { VFX } from '@vfx-js/core';
 import * as Tone from 'tone';
 
@@ -15,7 +16,7 @@ const GlCanvas: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const gl = canvas.getContext('webgl', { antialias: true }) as WebGL2RenderingContext;
+    const gl = canvas.getContext('webgl2', { antialias: true }) as WebGL2RenderingContext;
     if (!gl) {
       console.error('WebGL is not supported');
       return;
@@ -47,6 +48,20 @@ const GlCanvas: React.FC = () => {
     const analyser = new Tone.Analyser('waveform', 256);
     kick.connect(analyser);
 
+    let slider0Value: number = 0;
+    let midiController: MidiController | null = null;
+
+    const createMidiController = async() => {
+      try {
+        midiController = await MidiController.create();
+        midiController.onSlider0((value: number) => {
+          slider0Value = value;
+        });
+      } catch (error: unknown) {
+        console.log(error);
+      }
+    }
+
     const scene = (rotation: number, deltaTime: number) => {
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
       gl.clearDepth(1.0);
@@ -68,7 +83,7 @@ const GlCanvas: React.FC = () => {
       shader.setProjectMatrixUniform(projectionMatrix);
       shader.setModelViewMatrixUniform(modelViewMatrix);
 
-      animation.animate(deltaTime, volume);
+      animation.animate(deltaTime, volume, slider0Value);
       vfx.update(canvas);
     };
 
@@ -85,6 +100,9 @@ const GlCanvas: React.FC = () => {
       rotation += deltaTime;
       requestAnimationFrame(render);
     }
+
+    // MIDIコントローラーを初期化（1回だけ実行）
+    createMidiController();
 
     vfx.add(canvas, {shader: 'rgbShift'});
     requestAnimationFrame(render);

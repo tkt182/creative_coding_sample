@@ -60,6 +60,46 @@ const GlCanvas: React.FC = () => {
       }
     }
 
+    const ws = new WebSocket('ws://localhost:10000');
+    const pc = new RTCPeerConnection({
+      iceServers: []
+    });
+    pc.onicecandidate = ({ candidate }) => {
+      if (candidate) ws.send(JSON.stringify({ candidate }));
+    };
+
+    ws.onmessage = async ({ data }) => {
+      const text = await new Response(data).text();
+      const msg = JSON.parse(text);
+      if (msg.answer) {
+        if (!pc.remoteDescription) {
+          try {
+            await pc.setRemoteDescription(new RTCSessionDescription(msg.answer));
+          } catch (err) {
+          }
+        }
+      }
+      if (msg.candidate) {
+        await pc.addIceCandidate(msg.candidate);
+      }
+    };
+
+    const stream = canvas.captureStream(60);
+    console.log(stream);
+    stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+    ws.addEventListener('open', async () => {
+      console.log('WebSocket connected. Creating offer...');
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      ws.send(JSON.stringify({ offer }));
+      console.log('Sent offer to receiver');
+    });
+
+    ws.addEventListener('error', (e) => {
+      console.error('WebSocket error:', e);
+    });
+
     const scene = (rotation: number, deltaTime: number) => {
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
       gl.clearDepth(1.0);

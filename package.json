@@ -5,7 +5,8 @@
     "korg-nano-kontrol2": "^0.3.0",
     "noisejs": "^2.1.0",
     "react-vfx": "^0.10.2",
-    "tone": "^15.0.4"
+    "tone": "^15.0.4",
+    "ws": "^8.18.2"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.27.2",

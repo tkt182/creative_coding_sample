@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Receiver</title>
+</head>
+<body>
+  <h1>Receiver</h1>
+  <video id="remoteVideo" autoplay playsinline muted></video>
+
+  <script type="module">
+    class Receiver {
+      constructor() {
+        this.video = document.getElementById('remoteVideo');
+        this.ws = new WebSocket('ws://localhost:10000');
+
+        this.pc = new RTCPeerConnection({
+          iceServers: []
+        });
+
+        this.ws.addEventListener('open', () => {
+          console.log('Receiver: WebSocket connected');
+        });
+
+        this.ws.addEventListener('message', this.onMessage.bind(this));
+
+        this.pc.onicecandidate = (event) => {
+          if (event.candidate) {
+            this.ws.send(JSON.stringify({ candidate: event.candidate }));
+          }
+        };
+
+        this.pc.ontrack = (event) => {
+          this.video.srcObject = event.streams[0];
+        };
+      }
+
+      async onMessage(event) {
+        const text = await new Response(event.data).text();
+        const msg = JSON.parse(text);
+
+        if (msg.offer) {
+          console.log('Receiver: received offer');
+          await this.pc.setRemoteDescription(new RTCSessionDescription(msg.offer));
+          const answer = await this.pc.createAnswer();
+          await this.pc.setLocalDescription(answer);
+          this.ws.send(JSON.stringify({ answer }));
+          console.log('Receiver: sent answer');
+        }
+
+        if (msg.candidate) {
+          try {
+            await this.pc.addIceCandidate(new RTCIceCandidate(msg.candidate));
+            console.log('Receiver: added ICE candidate');
+          } catch (err) {
+            console.error('Receiver: failed to add ICE candidate', err);
+          }
+        }
+      }
+    }
+
+    new Receiver();
+  </script>
+</body>
+</html>

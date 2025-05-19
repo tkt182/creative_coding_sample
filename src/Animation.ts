@@ -1,5 +1,4 @@
 import { Vbo } from './Vbo';
-import { MidiController } from 'MidiController';
 //@ts-ignore
 import { Noise } from 'noisejs';
 

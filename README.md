@@ -4,7 +4,7 @@
 
 # 起動
 
-`$ npx webpack serve`
+`$ npm run start`
 
 # 動作確認
 

@@ -36,8 +36,12 @@ const GlCanvas: React.FC = () => {
     const matrix = new Matrix(gl, ProjectionType.ORTHOGRAPHIC);
     //const matrix = new Matrix(gl, ProjectionType.PERSPECTIVE);
     const shader = new Shader(gl);
-    const vbo = new Vbo(gl, shader.getVertexAttribLocation());
+
+    const numVertices = Animation.getNumVertices();
+    const vbo = new Vbo(gl, shader.getVertexAttribLocation(), numVertices);
+
     const animation = new Animation(vbo, gl);
+    animation.setStartPosition();;
     const vfx = new VFX();
 
     const kick = new Tone.MembraneSynth().toDestination();
@@ -82,8 +86,11 @@ const GlCanvas: React.FC = () => {
       shader.useShader();
       shader.setProjectMatrixUniform(projectionMatrix);
       shader.setModelViewMatrixUniform(modelViewMatrix);
-
-      animation.animate(deltaTime, volume, slider0Value);
+      shader.setTimeUniform(deltaTime);
+      shader.setVolumeUniform(volume);
+      shader.setSliderValueUniform(slider0Value);
+      gl.drawArrays(gl.LINE_LOOP, 0, numVertices);
+      //gl.flush();
       vfx.update(canvas);
     };
 
@@ -104,7 +111,8 @@ const GlCanvas: React.FC = () => {
     // MIDIコントローラーを初期化（1回だけ実行）
     createMidiController();
 
-    vfx.add(canvas, {shader: 'rgbShift'});
+    //vfx.add(canvas, {shader: 'rgbShift'});
+    vfx.add(canvas, {shader: 'halftone'});
     requestAnimationFrame(render);
   }, []);
 

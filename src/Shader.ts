@@ -14,8 +14,8 @@ export class Shader {
     }
     this.gl = gl;
 
-    this.vertexShaderSource = `
-      attribute vec4 aVertexPosition;
+    this.vertexShaderSource = `#version 300 es
+      in vec4 aVertexPosition;
       uniform mat4 uModelViewMatrix;
       uniform mat4 uProjectionMatrix;
       void main() {
@@ -23,13 +23,14 @@ export class Shader {
       }
     `;
 
-    this.fragmentShaderSource = `
+    this.fragmentShaderSource = `#version 300 es
       precision mediump float;
+      out vec4 fragColor;
       void main() {
         float dist = abs(gl_FragCoord.z);
         float alpha = smoothstep(1.0, 1.5, dist);
         vec4 color = vec4(1.0, 1.0, 1.0, 1.0 * (1.0 - alpha));
-        gl_FragColor = color;
+        fragColor = color;
       }
     `;
 

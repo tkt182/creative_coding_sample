@@ -33,7 +33,7 @@ export class Animation {
       vertices.push(x + xnoize, y + ynoize);
     }
 
-    this.vbo.updateVbo(new Float32Array(vertices));
+    this.vbo.updateVbo(new Float32Array(vertices), numVertices);
     this.gl.drawArrays(this.gl.LINE_LOOP, 0, numVertices);
   }
 

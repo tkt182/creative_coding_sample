@@ -1,6 +1,8 @@
 export class Vbo {
   private gl: WebGL2RenderingContext;
   private vbo!: WebGLBuffer;
+  private prevNumVertices: number = 0;
+  private numVertices: number = 0;
 
   constructor(gl: WebGL2RenderingContext, data: GLint) {
     if (!gl) {
@@ -37,9 +39,14 @@ export class Vbo {
     this.gl.enableVertexAttribArray(data);
   }
 
-  public updateVbo(data: Float32Array) {
-    //this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertexPosition), this.gl.DYNAMIC_DRAW);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, data, this.gl.DYNAMIC_DRAW);
+  public updateVbo(data: Float32Array, numVertices: number) {
+    this.numVertices = numVertices;
+    if (this.numVertices !== this.prevNumVertices) {
+      this.gl.bufferData(this.gl.ARRAY_BUFFER, data, this.gl.DYNAMIC_DRAW);
+    }
+    else {
+      this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, data);
+    }
+    this.prevNumVertices = this.numVertices;
   }
-
 }

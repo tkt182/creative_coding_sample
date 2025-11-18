@@ -28,8 +28,8 @@ export class Animation {
       const r = a * Math.sin(n / d * theta);
       const x = r * Math.cos(theta);
       const y = r * Math.sin(theta);
-      const xnoize = this.noise.perlin2(time + y + volume, 0);
-      const ynoize = this.noise.perlin2(0, time + x + volume);
+      const xnoize = this.noise.perlin2(time + y + volume, time * y * volume);
+      const ynoize = this.noise.perlin2(time * x * volume, time + x + volume);
       vertices.push(x + xnoize, y + ynoize);
     }
 
